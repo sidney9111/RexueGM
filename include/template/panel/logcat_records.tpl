@@ -5,10 +5,15 @@
 
 <{$osadmin_action_alert}>
 <{$osadmin_quick_note}>
-<!-- <javascript>
-	
-</javascript> -->
+<script>
+function onRefresh (argument) {
+	//$("#tab     tbody").append("<tr><td>第二行文字</td></tr>");
+	$("table tbody tr").first().before("<tr><td>1111111111</td><td>2111addfadf111</td><td>erewre</td></tr>");
+}
+</script>
+<div onclick="onRefresh();">dfsdljfslkdjflskdjf</div>
 <div class="btn-toolbar">
+
 	<a href="logcat_testing.php"  class="btn btn-primary"><i class="icon-plus"></i> Quick Note</a>
 </div>
 <div class="block">
