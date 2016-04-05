@@ -7,11 +7,45 @@
 <{$osadmin_quick_note}>
 <script>
 function onRefresh (argument) {
+	//todo>need to config site root 
+	var url = "http://192.168.1.153/OSAdmin/api/logcat.php"
+	$.ajax({ url: url, success: function(data){
+        //$(this).addClass("done");
+        //console.log(data);
+        var arr = eval(data);
+        //alert(arr.length);
+        //clear 
+        $("table tbody tr").empty();
+        for(var key in arr){
+ 			//alert(arr[item]);
+ 			//速度其实会比较慢，around 1.4 sec
+        	$("table tbody tr").first().before("<tr><td>" + key + "</td><td>2111</td><td>" + arr[key]+ "</td><td></td></tr>");	
+        	//速度会快，too short 0.1 sec
+        	// $("table tbody").append("<tr><td>" + key + "</td><td>2111</td><td>" + arr[key] + "</td><td></td></tr>");
+        }
+        
+      }});
 	//$("#tab     tbody").append("<tr><td>第二行文字</td></tr>");
-	$("table tbody tr").first().before("<tr><td>1111111111</td><td>2111addfadf111</td><td>erewre</td></tr>");
+	
+}
+function filter (argument) {
+	alert($("input:text[name='filter_string']").val());
+	
 }
 </script>
 <div onclick="onRefresh();">dfsdljfslkdjflskdjf</div>
+<div style="border:0px;padding-bottom:5px;height:auto">
+	<div style="float:left;margin-right:5px">
+		<label>可加检索条件,Tag:Unity等</label>
+		<input type="text" name="filter_string" value="<{$_GET.user_name}>" placeholder="输入用户名" > 
+	</div>
+
+	<div class="btn-toolbar" style="padding-top:25px;padding-bottom:0px;margin-bottom:0px">
+		<a class="btn btn-primary" onclick="filter();"><i  class="icon-plus"></i>Filter</a>
+		<a data-toggle="collapse" onclick="onRefresh();" data-target="#search" title="检索"><button class="btn btn-primary" style="margin-left:5px"><i class="icon-search" ></i></button></a>
+	</div>
+
+	<div style="clear:both;"></div>
 <div class="btn-toolbar">
 
 	<a href="logcat_testing.php"  class="btn btn-primary"><i class="icon-plus"></i> Quick Note</a>
