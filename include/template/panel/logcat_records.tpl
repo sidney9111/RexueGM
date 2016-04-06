@@ -6,7 +6,38 @@
 <{$osadmin_action_alert}>
 <{$osadmin_quick_note}>
 <script>
-function onRefresh (argument) {
+// /**
+// * 删除左右两端的空格
+// */
+// String.prototype.trim=function()
+// {
+//      return this.replace(/(^\s*)|(\s*$)/g, ”);
+// }
+// /**
+// * 删除左边的空格
+// */
+// String.prototype.ltrim=function()
+// {
+//      return this.replace(/(^\s*)/g,”);
+// }
+// /**
+// * 删除右边的空格
+// */
+// String.prototype.rtrim=function()
+// {
+//      return this.replace(/(\s*$)/g,”);
+// }
+function OFilter(){
+	//this.key = key;//0空,1检索内容2,检索Tag
+	//this.string = string;
+}
+OFilter.prototype.setKey=function(key){
+	this.key = key
+}
+OFilter.prototype.setString = function(string) {
+	this.string = string;
+}
+function onRefresh (key,string) {
 	//todo>need to config site root 
 	var url = "http://192.168.1.153/OSAdmin/api/logcat.php"
 	$.ajax({ url: url, success: function(data){
@@ -19,21 +50,50 @@ function onRefresh (argument) {
         for(var key in arr){
  			//alert(arr[item]);
  			//速度其实会比较慢，around 1.4 sec
-        	$("table tbody tr").first().before("<tr><td>" + key + "</td><td>2111</td><td>" + arr[key]+ "</td><td></td></tr>");	
+        	$("table tbody tr").first().before("<tr><td>" + key + "</td><td>2111</td><td>" + arr[key]+ "</td><td><a href='quicknote_modify.php?note_id=<{$note.note_id}>' title= '展开' ><i class='icon-pencil'></i></a>&nbsp;<a data-toggle='modal' href='#myModal'  title= '上下文' ><i class='icon-remove' href='quicknotes.php?method=del&note_id=<{$note.note_id}>#myModal' data-toggle='modal' ></i></a></td></tr>");	
         	//速度会快，too short 0.1 sec
         	// $("table tbody").append("<tr><td>" + key + "</td><td>2111</td><td>" + arr[key] + "</td><td></td></tr>");
         }
         
       }});
 	//$("#tab     tbody").append("<tr><td>第二行文字</td></tr>");
-	
 }
 function filter (argument) {
-	alert($("input:text[name='filter_string']").val());
-	
+	//alert($("input:text[name='filter_string']").val());
+	var ret = readFilter($("input:text[name='filter_string']").val());
+	//alert(ret.key);
+	var records = $("table tbody tr");
+	for (var i=records.length-1;i>=0;i--) {
+		console.log(records.string);
+		if(records.eq(i).html().indexOf(ret.string) == -1 ){
+     		//records.eq(i).remove();
+     		records.eq(i).css('display', 'none');  
+     		console.log("yeo");
+		}else{
+			console.log("contain");
+			records.eq(i).css('display','');
+		}
+	}
+}
+function readFilter($value='')
+{
+	var ret = new OFilter();
+	var words = $value.split(':');
+	if($value=="") {
+		ret.setKey(0);
+		return ret;
+	}
+	if(words.length==2){
+		ret.setKey(2);
+		ret.setString(words[1]);
+	}
+	else{
+		ret.setKey(1);
+		ret.setString(words[0]);
+	}
+	return ret;
 }
 </script>
-<div onclick="onRefresh();">dfsdljfslkdjflskdjf</div>
 <div style="border:0px;padding-bottom:5px;height:auto">
 	<div style="float:left;margin-right:5px">
 		<label>可加检索条件,Tag:Unity等</label>
@@ -42,16 +102,12 @@ function filter (argument) {
 
 	<div class="btn-toolbar" style="padding-top:25px;padding-bottom:0px;margin-bottom:0px">
 		<a class="btn btn-primary" onclick="filter();"><i  class="icon-plus"></i>Filter</a>
-		<a data-toggle="collapse" onclick="onRefresh();" data-target="#search" title="检索"><button class="btn btn-primary" style="margin-left:5px"><i class="icon-search" ></i></button></a>
+		<a data-toggle="collapse" onclick="onRefresh();" title="检索"><button class="btn btn-primary" style="margin-left:5px"><i class="icon-search" ></i></button></a>
 	</div>
 
 	<div style="clear:both;"></div>
-<div class="btn-toolbar">
-
-	<a href="logcat_testing.php"  class="btn btn-primary"><i class="icon-plus"></i> Quick Note</a>
-</div>
 <div class="block">
-	<a href="#page-stats" class="block-heading" data-toggle="collapse">Quick Note列表</a>
+	<a href="#page-stats" class="block-heading" data-toggle="collapse">Logcat Records</a>
 	<div id="page-stats" class="block-body collapse in">
 		<table class="table table-striped">
 			<thead>
