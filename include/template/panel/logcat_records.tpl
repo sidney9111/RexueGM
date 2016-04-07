@@ -37,15 +37,27 @@ OFilter.prototype.setKey=function(key){
 OFilter.prototype.setString = function(string) {
 	this.string = string;
 }
+function JSAdminAlert(msg){
+	var alert_html="<div class=\"alert alert-$type\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>" + msg +"</div>";
+	$("#bar").append(alert_html);
+}
 function onRefresh (key,string) {
 	//todo>need to config site root 
-	var url = "http://192.168.1.153/OSAdmin/api/logcat.php"
+	var url = "http://127.0.0.1:81/OSAdmin/api/logcat.php"
 	$.ajax({ url: url, success: function(data){
+		//todo>error处理
         //$(this).addClass("done");
         //console.log(data);
-        var arr = eval(data);
+        var arr = eval("["+data+"]");
+        console.log(arr[0]["ret"]);
+        if(arr[0]["ret"]!=0){
+        	JSAdminAlert(arr[0]["msg"]);
+        	return;
+        }
+
         //alert(arr.length);
         //clear 
+        arr = eval(arr[0]["msg"]);
         $("table tbody tr").empty();
         for(var key in arr){
  			//alert(arr[item]);
@@ -105,7 +117,7 @@ function readFilter($value='')
 		<a data-toggle="collapse" onclick="onRefresh();" title="检索"><button class="btn btn-primary" style="margin-left:5px"><i class="icon-search" ></i></button></a>
 	</div>
 
-	<div style="clear:both;"></div>
+	<div id="bar" style="clear:both;"></div>
 <div class="block">
 	<a href="#page-stats" class="block-heading" data-toggle="collapse">Logcat Records</a>
 	<div id="page-stats" class="block-body collapse in">

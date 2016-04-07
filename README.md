@@ -1,4 +1,4 @@
-# RexueGM
+﻿# RexueGM
 游戏服GM工具集合，a gm tools suit for game server
 
 目前基于OSAdmin(登录验证功能，以及Display模块)
@@ -6,6 +6,14 @@ Now this project base on an OSAdmin platform(Mainjor in Login and Display module
 
 如果你有能力替换掉这个模块，也是可以不使用OSAdmin的，你懂的。
 If you do know PHP well and confident to take controll of these 2 moudles, it's better not use OSAdmin.I dont have to tell you the detail here, because you are a senior PHPer, you do konw the details.
+
+2016.04.07 v0.2 
+修复一些界面，添加Logcat索引
+Fixed some UI, add filter of Logcat Records
+
+2016.04.05 v0.1 
+新建Android Adb调试日志
+Creaet Android Adb Debug Log
 
 
 封言封语
@@ -18,3 +26,6 @@ If you do know PHP well and confident to take controll of these 2 moudles, it's 
 韩寒/小4	- 靠脸吃饭
 政治		- 群众活动，媒体
 宗教		- 历史遗产
+
+
+
