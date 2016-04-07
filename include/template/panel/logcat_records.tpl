@@ -6,6 +6,7 @@
 <{$osadmin_action_alert}>
 <{$osadmin_quick_note}>
 <script>
+var rootPath = "http://192.168.1.153/OSAdmin"
 // /**
 // * 删除左右两端的空格
 // */
@@ -43,13 +44,13 @@ function JSAdminAlert(msg){
 }
 function onRefresh (key,string) {
 	//todo>need to config site root 
-	var url = "http://127.0.0.1:81/OSAdmin/api/logcat.php"
+	var url = rootPath + "/api/logcat.php"
 	$.ajax({ url: url, success: function(data){
 		//todo>error处理
         //$(this).addClass("done");
         //console.log(data);
         var arr = eval("["+data+"]");
-        console.log(arr[0]["ret"]);
+        //console.log(arr[0]["ret"]);
         if(arr[0]["ret"]!=0){
         	JSAdminAlert(arr[0]["msg"]);
         	return;
@@ -58,11 +59,11 @@ function onRefresh (key,string) {
         //alert(arr.length);
         //clear 
         arr = eval(arr[0]["msg"]);
-        $("table tbody tr").empty();
+        //$("table tbody tr").empty();
         for(var key in arr){
  			//alert(arr[item]);
  			//速度其实会比较慢，around 1.4 sec
-        	$("table tbody tr").first().before("<tr><td>" + key + "</td><td>2111</td><td>" + arr[key]+ "</td><td><a href='quicknote_modify.php?note_id=<{$note.note_id}>' title= '展开' ><i class='icon-pencil'></i></a>&nbsp;<a data-toggle='modal' href='#myModal'  title= '上下文' ><i class='icon-remove' href='quicknotes.php?method=del&note_id=<{$note.note_id}>#myModal' data-toggle='modal' ></i></a></td></tr>");	
+        	$("table tbody tr").first().before("<tr><td style='width:40px'>" + key + "</td><td style='width:70px'>0</td><td>" + arr[key]+ "</td><td><a href='quicknote_modify.php?note_id=<{$note.note_id}>' title= '展开' ><i class='icon-pencil'></i></a>&nbsp;<a data-toggle='modal' href='#myModal'  title= '上下文' ><i class='icon-remove' href='quicknotes.php?method=del&note_id=<{$note.note_id}>#myModal' data-toggle='modal' ></i></a></td></tr>");	
         	//速度会快，too short 0.1 sec
         	// $("table tbody").append("<tr><td>" + key + "</td><td>2111</td><td>" + arr[key] + "</td><td></td></tr>");
         }
@@ -105,6 +106,22 @@ function readFilter($value='')
 	}
 	return ret;
 }
+ // (function() {
+
+ // 	$("#field_sdk").change(function(){
+	// 	alert("fff");
+ //  		$(this).css("background-color","#FFFFCC");
+	// });
+
+ // })();//模拟document.ready事件
+//document.ready is not a function
+// document.ready(function() {
+// 	alert("ready");
+// 	$("#field_sdk").change(function(){
+// 		alert("fff");
+// 		$(this).css("background-color","#FFFFCC");
+// 	});
+// });
 </script>
 <div style="border:0px;padding-bottom:5px;height:auto">
 	<div style="float:left;margin-right:5px">
@@ -114,10 +131,59 @@ function readFilter($value='')
 
 	<div class="btn-toolbar" style="padding-top:25px;padding-bottom:0px;margin-bottom:0px">
 		<a class="btn btn-primary" onclick="filter();"><i  class="icon-plus"></i>Filter</a>
-		<a data-toggle="collapse" onclick="onRefresh();" title="检索"><button class="btn btn-primary" style="margin-left:5px"><i class="icon-search" ></i></button></a>
+		<a data-toggle="collapse" data-target="#search" href="#" onclick="onRefresh();" title="检索"><button class="btn btn-primary" style="margin-left:5px"><i class="icon-search" ></i></button></a>
 	</div>
 
 	<div id="bar" style="clear:both;"></div>
+<{if $_GET.search or $show_search==true}>
+<div id="search" class="collapse in">
+<{else }>
+<div id="search" class="collapse out" >
+<{/if }>
+<form class="form_search"  action="" method="GET" style="margin-bottom:0px">
+<!-- 	<div style="float:left;margin-right:5px">
+		<label>选择账号组</label>
+		<{html_options name=user_group id="DropDownTimezone" class="input-xlarge" options=$group_options selected=$_GET.user_group}>
+	</div> -->
+	<div style="float:left;margin-right:5px">
+		<label>SDK路径</label>
+		<input type="text" id="field_sdk" name="user_name" value="<{$sdk_directory}>" placeholder="输入SDK路径" > 
+		<input type="hidden" name="search" value="1" > 
+	</div>
+	<!-- <div class="btn-toolbar" style="padding-top:25px;padding-bottom:0px;margin-bottom:0px">
+		<button type="submit" class="btn btn-primary">检索</button>
+		<input type="file" name="excel"   class="input-xlarge">
+	</div> -->
+	<div style="clear:both;"></div>
+</form>
+</div>
+<script type="text/javascript">
+$("#field_sdk").change(function(){
+	$(this).css("background-color","#FFFFCC");
+	//路径检测
+	var directory = $(this).val();
+	var patrn=/^[a-zA-Z]:[\\]((?! )(?![^\\/]*\s+[\\/])[\w -]+[\\/])*(?! )(?![^.]*\s+\.)[\w -]+$/; 
+	//var patrn = /^[a-zA-Z]:[\\]+$/;
+	if (!patrn.exec(directory)){
+		JSAdminAlert("请使用以下格式，最后不需要斜杠，d:\\[directory name]")
+		return;
+	}
+	
+	var url = "http://192.168.1.153/OSAdmin/api/logcat.php?a=save_logcat&dir=" + directory
+	$.ajax({ url: url, success: function(data){
+		var ret = eval("["+data+"]");
+		console.log("save sdk ");
+		console.log(ret);
+		if(ret[0]["ret"]==1){
+			JSAdminAlert(ret[0]["msg"]);
+		}
+	}});
+});
+$("#field_sdk").focus(function(){
+	$(this).css("background-color","#FFFFFF");
+});
+</script>
+
 <div class="block">
 	<a href="#page-stats" class="block-heading" data-toggle="collapse">Logcat Records</a>
 	<div id="page-stats" class="block-body collapse in">

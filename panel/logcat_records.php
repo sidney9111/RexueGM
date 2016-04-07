@@ -1,5 +1,6 @@
 <?php
 require ('../include/init.inc.php');
+require ('../api/LogcatUtil.php');
 $method = $page_no = $note_id = '';
 extract ( $_GET, EXTR_IF_EXISTS );
 
@@ -39,6 +40,14 @@ $quicknotes = QuickNote::getNotes($start,$page_size);
 $confirm_html = OSAdmin::renderJsConfirm("icon-remove");
 
 $page_html=Pagination::showPager("",$page_no,PAGE_SIZE,$row_count);
+
+// //todo>分离: and 提示是否有sdk
+$sdk_directory  = LogcatUtil::getSDK_Directory();
+if($sdk_directory==""){
+	OSAdmin::alert("error","请先设置Android SDK路径");
+	Template::assign ( 'show_search', true );
+}
+Template::assign ( 'sdk_directory', LogcatUtil::getSDK_Directory() );
 
 Template::assign ( 'page_no', $page_no );
 Template::assign ( 'page_size', PAGE_SIZE );

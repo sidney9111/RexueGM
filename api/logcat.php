@@ -1,5 +1,6 @@
 <?php
 require ('../include/init.inc.php');
+require ('LogcatUtil.php');
 //echo "aaa||";
 if (Common::isPost ()) {
 	//todo>清除正在执行command，或者加条件，command执行中不运行
@@ -9,6 +10,32 @@ if (Common::isPost ()) {
 	//todo>执行command
 	$myfile = fopen($path, "r") or die("Unable to open file!");
 	echo fread($myfile,filesize($path));
+}
+
+if(isset($_GET["a"])){
+	if($_GET["a"]=="save_logcat"){
+		save_sdk();
+	};
+	return;
+}
+function save_sdk(){
+	$text = $_GET["dir"] or "";
+	$text = "sdk_path:".$text;
+	//echo dirname(__FILE__)."\\logcat.config|";
+	//echo $text;
+	//session_start();
+	$handle = fopen(dirname(__FILE__)."\\logcat.config", "w");
+	//$text = $_POST['file_contents'];
+	if(fwrite($handle, $text) == FALSE){
+		//$_SESSION['error'] = ‘<span class=”redtxt”>There was an error</span>’;
+		//echo "false";
+	}else{
+		//echo "ok";
+		//$_SESSION['error'] = ‘<span class=”redtxt”>File edited successfully</span>’;
+	}
+	fclose($handle);
+	//header(“Location: “.$_POST['page']);
+	send_ret(0,"");
 }
 // function task1() {
 //     for ($i = 1; $i <= 10; ++$i) {
@@ -114,32 +141,32 @@ if (Common::isPost ()) {
 // // }  
 // fclose($fp);
 //-------------搞了一天，最后发现，完全不用PHP特性，用ADB！！！-------------
-	$sdk_path = 'H:\projects\android\android-sdk-windows\platform-tools';
-	$exe_script = $sdk_path.'/adb devices';
-	$a=exec($exe_script, $out, $status); 
-	if($status==0){
-		if($out[1]==""){
-			//OSAdmin::alert("error",ErrorMessage::USER_OR_PWD_WRONG);
-			//Template::Display ( 'login.tpl' );
-			echo json_encode(array("ret"=>1,"msg"=>"it seems you did not connect your device"));
-			die();	
-		}
-		
+//$sdk_path = 'D:\Android\adt-bundle-windows-x86_64-20140321\sdk\platform-tools';
+$sdk_path = LogcatUtil::getSDK_Directory().'\platform-tools';
+//todo>判断sdk是否存在
+$exe_script = $sdk_path.'/adb devices';
+$a=exec($exe_script, $out, $status); 
+if($status==0){
+	if($out[1]==""){
+		//OSAdmin::alert("error",ErrorMessage::USER_OR_PWD_WRONG);
+		//Template::Display ( 'login.tpl' );
+		echo json_encode(array("ret"=>1,"msg"=>"it seems you did not connect your device"));
+		die();	
 	}
-	// //version
-	//$exe_script = $sdk_path.'/adb version';
-	$exe_script = $sdk_path.'/adb version';
-	$exe_script = $sdk_path.'/adb logcat -v time -d >d:/log.txt';
-	//todo>
-	//1.可能被2个adb占用，暂时无法处理
-	//2.有2个devices的情况
-	$a = exec($exe_script, $out, $status);
-
+	
+}
+// //version
+$exe_script = $sdk_path.'/adb version';
+$exe_script = $sdk_path.'/adb logcat -v time -d >d:/log.txt';
+//todo>
+//1.可能被2个adb占用，暂时无法处理
+//2.有2个devices的情况
+$a = exec($exe_script, $out, $status);
 //------------Windows COM--------------------------------------------
 //$WshShell = new COM("WScript.Shell");
 //$oExec = $WshShell->Run($exe_script, 0, false);
 
-
+//todo> ndk analyse
 class AndroidUtil {
 	function ReadLog()
 	{
